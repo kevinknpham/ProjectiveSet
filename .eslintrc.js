@@ -12,5 +12,10 @@ module.exports = {
     ecmaVersion: 'latest',
   },
   rules: {
+    'no-use-before-define': ['error', {
+      functions: false,
+      classes: true,
+      variables: true,
+    }],
   },
 };
