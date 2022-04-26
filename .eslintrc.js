@@ -12,6 +12,9 @@ module.exports = {
     ecmaVersion: 'latest',
   },
   rules: {
+    'no-param-reassign': 'off',
+    'no-return-assign': 'off',
+    'no-restricted-syntax': 'off',
     'no-use-before-define': ['error', {
       functions: false,
       classes: true,
