@@ -1,7 +1,7 @@
 /**
  * Error for when a user's request can't be completed due to the game state
  */
-class GameStateError extends Error {
+class FailedActionError extends Error {
   constructor(action, reason) {
     super(`Error for action: ${action} with reason: ${reason}`);
     this.action = action;
@@ -10,4 +10,4 @@ class GameStateError extends Error {
   }
 }
 
-module.exports = GameStateError;
+module.exports = FailedActionError;

@@ -1,10 +1,10 @@
 const express = require('express');
-const expressWs = require('express-ws');
 
 const app = express();
-expressWs(app);
 
-const PORT = 5000;
+require('express-ws')(app);
+
+const PORT = 2345;
 
 app.use(express.static('public'));
 

@@ -1,7 +1,10 @@
-const InvalidRequestError = require('../errors/InvalidRequestError');
 const FailedActionError = require('../errors/FailedActionError');
+const validation = require('./parameterValidation');
 
-const { DEFAULT_NUM_DOTS } = require('../Constants');
+const { DEFAULT_NUM_DOTS, ACTIONS } = require('../Constants');
+
+// TODO change actions in handleMessage to use this or move action string literals to separate file
+const action = ACTIONS.CREATE_GAME;
 
 /**
  * Handles creation of a game
@@ -10,12 +13,9 @@ const { DEFAULT_NUM_DOTS } = require('../Constants');
  * the number of dots to use
  */
 function handleCreateGame(ws, games, params) {
-  if (!params.gameName) {
-    throw new InvalidRequestError('create-game: params.gameName is missing or invalid');
-  }
-  if (!params.playerName) {
-    throw new InvalidRequestError('create-game: params.playerName is missing or invalid');
-  }
+  validation.paramsNotNull(params, action);
+  validation.containsGameName(params, action);
+  validation.containsPlayerName(params, action);
 
   if (games.has(params.gameName)) {
     throw new FailedActionError('create-game', `The name "${params.gameName}" has already been taken`);
@@ -23,6 +23,7 @@ function handleCreateGame(ws, games, params) {
     const numDots = params.numDots || DEFAULT_NUM_DOTS;
     const deck = createDeck(numDots);
     shuffle(deck);
+    // TODO refactor creation of game mapping value to common function (if needed)
     const gameInfo = {
       numDots,
       started: false,
@@ -33,7 +34,11 @@ function handleCreateGame(ws, games, params) {
     games.set(params.gameName, gameInfo);
     ws.gameName = params.gameName;
     ws.playerName = params.playerName;
-    // TODO send back success status
+    // TODO refactor into if needed
+    ws.send(JSON.stringify({
+      action,
+      status: 'success',
+    }));
   }
 }
 

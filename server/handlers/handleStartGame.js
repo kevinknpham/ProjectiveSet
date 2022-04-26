@@ -1,26 +1,25 @@
-const InvalidRequestError = require('../errors/InvalidRequestError');
+const validation = require('./parameterValidation');
 
-const {refillTable} = require('./commonFunctions');
+const { refillTable, broadcastMessage, getGameStateObject } = require('./commonFunctions');
+
+const { ACTIONS } = require('../Constants');
+
+const action = ACTIONS.START_GAME;
 
 /**
  * Starts a game
  * @param {WebSocket} ws - WebSocket to send responses to
  */
 function handleStartGame(ws, games) {
-  if (!ws.gameName) {
-    throw new InvalidRequestError('start-game: client is not currently in a game');
-  }
-
-  if (!games.has(ws.gameName)) {
-    throw new InvalidRequestError(`Game name ${ws.gameName} not found`);
-  }
+  validation.playerIsInGame(ws, games, action);
 
   const gameInfo = games.get(ws.gameName);
   gameInfo.started = true;
 
   // Set table
   refillTable(gameInfo.table, gameInfo.deck, gameInfo.numDots);
-  // TODO broadcast message to all players
+  // TODO refactor code to get list of sockets from gameInfo.players
+  broadcastMessage(getGameStateObject(gameInfo), gameInfo.players.map((player) => player.socket));
 }
 
 module.exports = handleStartGame;

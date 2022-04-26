@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script defer>
+        let HOST = 'ws://localhost:2345/game';
+        let ws = new WebSocket(HOST);
+        let el;
+
+        ws.onmessage = (event) => {
+          console.log(event);
+          el = document.getElementById('output');
+          el.innerText = event.data;
+        };
+
+        ws.onopen = () => {
+          ws.send(JSON.stringify({
+            action: "create-game",
+            name: "derek",
+            x: 1,
+            y: 0.5,
+            attributes: {
+              color: "red"
+            }
+          }));
+        }
+
+    </script>
+  </head>
+  <body>
+    <p id="output"></p>
+  </body>
+</html>

@@ -1,7 +1,13 @@
-const InvalidRequestError = require('../errors/InvalidRequestError');
 const FailedActionError = require('../errors/FailedActionError');
+const validation = require('./parameterValidation');
 
-const { refillTable, cardEquals } = require('./commonFunctions');
+const {
+  refillTable, findCardInTable, getGameStateObject, broadcastMessage,
+} = require('./commonFunctions');
+
+const { ACTIONS } = require('../Constants');
+
+const action = ACTIONS.SUBMIT_SET;
 
 /**
  * Handles a player submitting a set
@@ -9,20 +15,13 @@ const { refillTable, cardEquals } = require('./commonFunctions');
  * @param {Object} params - must contain list of cards being submitted
  */
 function handleSubmitSet(ws, games, params) {
-  if (!ws.gameName) {
-    throw new InvalidRequestError('submit-set: client is not currently in a game');
-  }
-  if (!params.cards) {
-    throw new InvalidRequestError('submit-set: params.cards is missing or invalid');
-  }
+  validation.paramsNotNull(params, action);
+  validation.containsCards(params, action);
+  validation.playerIsInGame(ws, games, action);
 
-  if (!games.has(ws.gameName)) {
-    throw new InvalidRequestError(`submit-set: Game name ${ws.gameName} not found`);
-  }
   const gameInfo = games.get(ws.gameName);
-  if (!cardsAreInTable(params.cards, gameInfo.table)) {
-    throw new InvalidRequestError('submit-set: At least one card in the set is not on the table');
-  }
+  // TODO add following to the validation file
+  validation.isValidSubsetOfCards(params.cards, gameInfo.table);
 
   if (!isASet(params.cards)) {
     throw new FailedActionError('submit-set', 'The given params.cards does not make a valid set');
@@ -33,7 +32,8 @@ function handleSubmitSet(ws, games, params) {
     removeCardsFromTable(params.cards, gameInfo.table);
     // Repopulate deck
     refillTable(gameInfo.table, gameInfo.deck, gameInfo.numDots);
-    // TODO broadcast to all clients
+    // Broadcast to all clients
+    broadcastMessage(getGameStateObject(gameInfo), gameInfo.players.map((player) => player.socket));
     // TODO remove game from list if needed
   }
 }
@@ -55,34 +55,10 @@ function isASet(cards, numDots) {
   return !parities.includes(1);
 }
 
-function cardsAreInTable(set, table) {
-  for (const card of set) {
-    if (!findCardInTable(table, card)) {
-      return false;
-    }
-  }
-  return true;
-}
-
 function removeCardsFromTable(set, table) {
   for (const card of set) {
     table.remove(findCardInTable(table, card));
   }
-}
-
-/**
- *
- * @param {Number[][]} table - list of cards to check
- * @param {Number[]} card - card to check against list
- * @returns card in table that equals card, null if not found
- */
-function findCardInTable(table, card) {
-  for (const cardInTable of table) {
-    if (cardEquals(cardInTable, card)) {
-      return cardInTable;
-    }
-  }
-  return null;
 }
 
 module.exports = handleSubmitSet;

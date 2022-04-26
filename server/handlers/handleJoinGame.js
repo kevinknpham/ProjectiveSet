@@ -1,4 +1,11 @@
-const InvalidRequestError = require('../errors/InvalidRequestError');
+const FailedActionError = require('../errors/FailedActionError');
+const validation = require('./parameterValidation');
+
+const { broadcastMessage } = require('./commonFunctions');
+
+const { ACTIONS } = require('../Constants');
+
+const action = ACTIONS.JOIN_GAME;
 
 /**
  * Handles adding player to an existing game
@@ -6,24 +13,33 @@ const InvalidRequestError = require('../errors/InvalidRequestError');
  * @param {Object} params - must contain name of the game and name of the player
  */
 function handleJoinGame(ws, games, params) {
-  if (!params.gameName) {
-    throw new InvalidRequestError('join-game: params.gameName is missing or invalid');
-  }
-  if (!params.playerName) {
-    throw new InvalidRequestError('join-game: params.playerName is missing or invalid');
-  }
+  validation.paramsNotNull(params, action);
+  validation.containsGameName(params, action);
+  validation.containsPlayerName(params, action);
 
   if (!games.has(params.gameName)) {
-    ws.send(JSON.stringify({
-      action: 'join-game',
-      status: 'error',
-      reason: `${params.gameName} is does not exist`,
-    }));
+    throw new FailedActionError(action, `${params.gameName} is does not exist`);
   } else {
-    games.get(params.gameName).players.push({ socket: ws, score: 0 });
+    const gameInfo = games.get(params.gameName);
+    gameInfo.players.push({ socket: ws, score: 0 });
     ws.gameName = params.gameName;
     ws.playerName = params.playerName;
-    // TODO send back success status
+    // TODO refactor this and similar code in create game
+    ws.send(JSON.stringify({
+      action,
+      status: 'success',
+    }));
+    // TODO refactor code for creating player object (duplicated in commonFunctions)
+    broadcastMessage(
+      {
+        action,
+        player: {
+          name: params.playerName,
+          score: 0,
+        },
+      },
+      gameInfo.players.map((player) => player.socket),
+    );
   }
 }
 
