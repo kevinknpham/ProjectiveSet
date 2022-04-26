@@ -34,7 +34,7 @@ function handleCreateGame(ws, games, params) {
     games.set(params.gameName, gameInfo);
     ws.gameName = params.gameName;
     ws.playerName = params.playerName;
-    // TODO refactor into if needed
+    // TODO refactor into common file if needed
     ws.send(JSON.stringify({
       action,
       status: 'success',

@@ -44,10 +44,10 @@ function handleMessage(ws, games, msg) {
       console.log('Client encountered following error');
       console.log(e);
       console.log('-----------------------------------------------');
-      ws.send({
+      ws.send(JSON.stringify({
         status: 'error',
         reason: e.message,
-      });
+      }));
     } else if (e instanceof FailedActionError) {
       ws.send(JSON.stringify({
         action: e.action,
