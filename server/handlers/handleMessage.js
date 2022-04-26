@@ -14,7 +14,9 @@ const {
 
 function handleMessage(ws, games, msg) {
   try {
+    // TODO add handler for JSON parse error
     const data = JSON.parse(msg);
+    // TODO throw error if action doesn't exist
     switch (data.action) {
       case SUBMIT_SET:
         handleSubmitSet(ws, games, data.params);
