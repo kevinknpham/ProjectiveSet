@@ -20,5 +20,6 @@ module.exports = {
       classes: true,
       variables: true,
     }],
+    'no-console': 'off',
   },
 };
