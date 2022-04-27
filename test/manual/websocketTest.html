@@ -2,18 +2,11 @@
 <html lang="en">
   <head>
     <script defer>
-        let HOST = 'ws://localhost:2345/game';
-        let ws = new WebSocket(HOST);
-        let el;
+        const HOST = 'ws://localhost:2345/game';
+        const ws = new WebSocket(HOST);
 
-        ws.onmessage = (event) => {
-          console.log(event);
-          el = document.getElementById('output');
-          el.innerText = event.data;
-        };
-
-        ws.onopen = () => {
-          ws.send(JSON.stringify({
+        const requests = [
+          {
             action: "create-game",
             name: "derek",
             x: 1,
@@ -21,12 +14,36 @@
             attributes: {
               color: "red"
             }
-          }));
+          }
+        ];
+        
+        let i = 0;
+        
+        const sendNextRequest() {
+          if (i < requests.length) {
+            ws.send(JSON.stringify(requests[i]));
+            i++;
+          }
+        }
+
+        ws.onmessage = (event) => {
+          console.log(event);
+          const output = document.getElementById('output');
+          
+          const li = document.createElement('li');
+          li.innerText = event.data;
+
+          output.appendChild(li);
+          sendNextRequest();
+        };
+
+        ws.onopen = () => {
+          sendNextRequest();
         }
 
     </script>
   </head>
   <body>
-    <p id="output"></p>
+    <ul id="output"></ul>
   </body>
 </html>

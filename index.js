@@ -23,6 +23,7 @@ app.listen(process.env.PORT || PORT);
 const games = new Map();
 
 const handleMessage = require('./server/handlers/handleMessage');
+const handleLeaveGame = require('./server/handlers/handleLeaveGame');
 
 // eslint-disable-next-line no-unused-vars
 app.ws('/game', (ws, req) => {
@@ -30,5 +31,9 @@ app.ws('/game', (ws, req) => {
     handleMessage(ws, games, msg);
   });
 
-  // TODO set disconnect behavior
+  ws.on('close', (ws, req) => {
+    if (ws.gameName) {
+      handleLeaveGame(ws, games);
+    }
+  });
 });

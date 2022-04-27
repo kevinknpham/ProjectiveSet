@@ -5,6 +5,7 @@ const handleCreateGame = require('./handleCreateGame');
 const handleJoinGame = require('./handleJoinGame');
 const handleStartGame = require('./handleStartGame');
 const handleSubmitSet = require('./handleSubmitSet');
+const handleLeaveGame = require('./handleLeaveGame');
 
 const { ACTIONS } = require('../Constants');
 
@@ -14,9 +15,20 @@ const {
 
 function handleMessage(ws, games, msg) {
   try {
-    // TODO add handler for JSON parse error
-    const data = JSON.parse(msg);
-    // TODO throw error if action doesn't exist
+    let data;
+    try {
+      data = JSON.parse(msg);
+    } catch (e) {
+      if (e instanceof SyntaxError) {
+        throw new InvalidRequestError('request was not JSON formatted');
+      } else {
+        throw e;
+      }
+    }
+    if (!data.action) {
+      throw new InvalidRequestError('request is missing "action" attribute');
+    }
+
     switch (data.action) {
       case SUBMIT_SET:
         handleSubmitSet(ws, games, data.params);
@@ -33,12 +45,12 @@ function handleMessage(ws, games, msg) {
       case LEAVE_GAME:
         // TODO implement leave-game logic
         // Remember if everyone leaves a game, it should be dropped
+        handleLeaveGame(ws, games);
         break;
       default:
-        throw new InvalidRequestError(`Invalid Action: ${data.action} is not one of create-game, join-game, start-game, submit-set, leave-game`);
+        throw new InvalidRequestError(`${data.action} is not one of create-game, join-game, start-game, submit-set, leave-game`);
     }
   } catch (e) {
-    // TODO handle exceptions
     if (e instanceof InvalidRequestError) {
       console.log('-----------------------------------------------');
       console.log('Client encountered following error');
@@ -55,6 +67,7 @@ function handleMessage(ws, games, msg) {
         reason: e.reason,
       }));
     } else {
+      console.error('\u001b[31mEncountered unexpected error while handling message:\u001b[0m');
       console.error(e);
     }
   }

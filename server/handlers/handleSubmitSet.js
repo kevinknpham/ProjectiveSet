@@ -20,7 +20,7 @@ function handleSubmitSet(ws, games, params) {
   validation.playerIsInGame(ws, games, action);
 
   const gameInfo = games.get(ws.gameName);
-  // TODO add following to the validation file
+
   validation.isValidSubsetOfCards(params.cards, gameInfo.table);
 
   if (!isASet(params.cards)) {

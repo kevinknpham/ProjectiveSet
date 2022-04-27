@@ -29,7 +29,7 @@ function handleJoinGame(ws, games, params) {
       action,
       status: 'success',
     }));
-    // TODO refactor code for creating player object (duplicated in commonFunctions)
+    // TODO refactor code for creating player object (duplicated in create)
     broadcastMessage(
       {
         action,
