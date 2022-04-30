@@ -2,8 +2,10 @@
 <html lang="en">
   <head>
     <script defer>
-        const HOST = 'ws://localhost:2345/game';
-        const ws = new WebSocket(HOST);
+        // const HOST = 'ws://localhost:2345/game';
+        // const ws = new WebSocket(HOST);
+        let HOST = location.origin.replace(/^http/, 'ws');
+let ws = new WebSocket(HOST);
         
         window.addEventListener('load', init);
 
