@@ -8,18 +8,19 @@
         const requests = [
           {
             action: "create-game",
-            name: "derek",
-            x: 1,
-            y: 0.5,
-            attributes: {
-              color: "red"
+            params: {
+              gameName: "testGame",
+              playerName: "testPlayer"
             }
+          },
+          {
+            action: "start-game"
           }
         ];
         
         let i = 0;
-        
-        const sendNextRequest() {
+
+        function sendNextRequest() {
           if (i < requests.length) {
             ws.send(JSON.stringify(requests[i]));
             i++;

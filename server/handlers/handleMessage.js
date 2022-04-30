@@ -43,8 +43,6 @@ function handleMessage(ws, games, msg) {
         handleStartGame(ws, games);
         break;
       case LEAVE_GAME:
-        // TODO implement leave-game logic
-        // Remember if everyone leaves a game, it should be dropped
         handleLeaveGame(ws, games);
         break;
       default:

@@ -13,6 +13,7 @@ const action = ACTIONS.JOIN_GAME;
  * @param {Object} params - must contain name of the game and name of the player
  */
 function handleJoinGame(ws, games, params) {
+  // TODO check if player is already in game, do nothing or error if they are
   validation.paramsNotNull(params, action);
   validation.containsGameName(params, action);
   validation.containsPlayerName(params, action);
@@ -24,7 +25,6 @@ function handleJoinGame(ws, games, params) {
     gameInfo.players.push({ socket: ws, score: 0 });
     ws.gameName = params.gameName;
     ws.playerName = params.playerName;
-    // TODO refactor this and similar code in create game
     ws.send(JSON.stringify({
       action,
       status: 'success',
