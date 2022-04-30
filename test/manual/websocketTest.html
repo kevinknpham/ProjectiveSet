@@ -4,27 +4,24 @@
     <script defer>
         const HOST = 'ws://localhost:2345/game';
         const ws = new WebSocket(HOST);
-
-        const requests = [
-          {
-            action: "create-game",
-            params: {
-              gameName: "testGame",
-              playerName: "testPlayer"
-            }
-          },
-          {
-            action: "start-game"
-          }
-        ];
         
-        let i = 0;
+        window.addEventListener('load', init);
+
+        function init() {
+          document.querySelector('#submit-btn').addEventListener('click', sendNextRequest);
+        }
 
         function sendNextRequest() {
-          if (i < requests.length) {
-            ws.send(JSON.stringify(requests[i]));
-            i++;
-          }
+          const input = document.querySelector('textarea');
+          ws.send(input.value);
+          input.value = `
+{
+  "action": "",
+  "params": {
+    "": ""
+  }
+}
+          `.trim();
         }
 
         ws.onmessage = (event) => {
@@ -35,16 +32,27 @@
           li.innerText = event.data;
 
           output.appendChild(li);
-          sendNextRequest();
         };
 
         ws.onopen = () => {
-          sendNextRequest();
+          const input = document.querySelector('textarea');
+          input.value = `
+{
+  "action": "create-game",
+  "params": {
+    "": ""
+  }
+}
+          `.trim();
         }
 
     </script>
   </head>
   <body>
+    <div>
+      <textarea id="w3review" name="w3review" rows="20" cols="80"></textarea>
+      <input type="submit" value="Submit" id="submit-btn">
+    </div>
     <ul id="output"></ul>
   </body>
 </html>

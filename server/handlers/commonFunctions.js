@@ -38,7 +38,7 @@ function findCardInTable(table, card) {
  */
 function broadcastMessage(message, clients) {
   for (const client of clients) {
-    client.send(message);
+    client.send(JSON.stringify(message));
   }
 }
 

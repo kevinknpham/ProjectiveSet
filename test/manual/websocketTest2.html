@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script defer>
+        const HOST = 'ws://localhost:2345/game';
+        const ws = new WebSocket(HOST);
+
+        const requests = [
+          {
+            action: "create-game",
+            params: {
+              gameName: "testGame2",
+              playerName: "testPlayer"
+            }
+          },
+          {
+            action: "start-game"
+          }
+        ];
+        
+        let i = 0;
+
+        function sendNextRequest() {
+          if (i < requests.length) {
+            ws.send(JSON.stringify(requests[i]));
+            i++;
+          }
+        }
+
+        ws.onmessage = (event) => {
+          console.log(event);
+          const output = document.getElementById('output');
+          
+          const li = document.createElement('li');
+          li.innerText = event.data;
+
+          output.appendChild(li);
+          sendNextRequest();
+        };
+
+        ws.onopen = () => {
+          sendNextRequest();
+        }
+
+    </script>
+  </head>
+  <body>
+    <ul id="output"></ul>
+  </body>
+</html>

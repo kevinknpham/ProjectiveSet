@@ -7,6 +7,8 @@ require('express-ws')(app);
 const PORT = 2345;
 
 app.use(express.static('public'));
+// TODO remove for actual finished product
+app.use(express.static('test'));
 
 app.get('/api', (req, res) => {
   res.send({
@@ -31,7 +33,8 @@ app.ws('/game', (ws, req) => {
     handleMessage(ws, games, msg);
   });
 
-  ws.on('close', (ws, req) => {
+  // eslint-disable-next-line no-unused-vars
+  ws.on('close', (reason, description) => {
     if (ws.gameName) {
       handleLeaveGame(ws, games);
     }
