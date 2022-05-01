@@ -3,7 +3,7 @@
  */
 
 const InvalidRequestError = require('../errors/InvalidRequestError');
-const { findCardInListOfCards } = require('./commonFunctions');
+const { findCardInListOfCards, cardEquals } = require('./commonFunctions');
 
 function paramsNotNull(params, action) {
   if (!params) {
@@ -18,8 +18,22 @@ function containsGameId(params, action) {
 }
 
 function containsCards(params, action) {
-  if (!params.cards || params.cards.length === 0) {
+  if (!params.cards) {
     throw createError('params.cards is invalid or undefined', action);
+  }
+}
+
+function cardsAreValid(params, action) {
+  const { cards } = params;
+  if (cards.length === 0) {
+    throw createError('params.cards is empty', action);
+  }
+  for (let i = 0; i < cards.length; i += 1) {
+    for (let j = i + 1; j < cards.length; j += 1) {
+      if (cardEquals(cards[i], cards[j])) {
+        throw createError('params.cards contains a duplicate card', action);
+      }
+    }
   }
 }
 
@@ -54,7 +68,7 @@ function playerIsInGame(ws, games, action) {
 function isValidSubsetOfCards(subset, superset) {
   for (const card of subset) {
     if (!findCardInListOfCards(superset, card)) {
-      throw new InvalidRequestError('submit-set: At least one card in the set is not on the table');
+      throw new InvalidRequestError('submit-set: At least one card in params.set is not on the table');
     }
   }
 }
@@ -70,6 +84,7 @@ module.exports = {
   paramsNotNull,
   containsGameId,
   containsCards,
+  cardsAreValid,
   containsPlayerName,
   playerIsInGame,
   gameExists,

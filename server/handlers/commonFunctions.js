@@ -77,6 +77,16 @@ function getGameStateObject(fullGameData) {
   };
 }
 
+function setWsData(ws, gameId, playerName) {
+  ws.gameId = gameId;
+  // TODO should we persist player name between websockets?
+  ws.playerName = playerName;
+}
+
+function getSocketListFromGameInfo(gameInfo) {
+  return gameInfo.players.map((player) => player.socket);
+}
+
 module.exports = {
   refillTable,
   cardEquals,
@@ -84,4 +94,6 @@ module.exports = {
   broadcastMessage,
   getGameStateObject,
   getJoinGameResult,
+  setWsData,
+  getSocketListFromGameInfo,
 };

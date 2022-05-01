@@ -1,6 +1,11 @@
 const validation = require('./parameterValidation');
 
-const { refillTable, broadcastMessage, getGameStateObject } = require('./commonFunctions');
+const {
+  refillTable,
+  broadcastMessage,
+  getGameStateObject,
+  getSocketListFromGameInfo,
+} = require('./commonFunctions');
 
 const { ACTIONS } = require('../Constants');
 
@@ -19,7 +24,7 @@ function handleStartGame(ws, games) {
   // Set table
   refillTable(gameInfo.table, gameInfo.deck, gameInfo.numDots);
   // TODO refactor code to get list of sockets from gameInfo.players
-  broadcastMessage(getGameStateObject(gameInfo), gameInfo.players.map((player) => player.socket));
+  broadcastMessage(getGameStateObject(gameInfo), getSocketListFromGameInfo(gameInfo));
 }
 
 module.exports = handleStartGame;

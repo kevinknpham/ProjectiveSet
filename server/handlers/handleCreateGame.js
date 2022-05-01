@@ -1,9 +1,12 @@
 const validation = require('./parameterValidation');
 
 const {
-  DEFAULT_NUM_DOTS, ACTIONS, NUM_CHARACTERS_IN_GAME_ID, GAME_ID_POSSIBLE_CHARACTERS,
+  DEFAULT_NUM_DOTS,
+  ACTIONS,
+  NUM_CHARACTERS_IN_GAME_ID,
+  GAME_ID_POSSIBLE_CHARACTERS,
 } = require('../Constants');
-const { getJoinGameResult } = require('./commonFunctions');
+const { getJoinGameResult, setWsData } = require('./commonFunctions');
 
 const action = ACTIONS.CREATE_GAME;
 
@@ -24,6 +27,7 @@ function handleCreateGame(ws, games, params) {
   const gameId = generateGameId(games);
 
   const gameInfo = {
+    gameId,
     numDots,
     started: false,
     table: [],
@@ -31,8 +35,7 @@ function handleCreateGame(ws, games, params) {
     players: [{ socket: ws, score: 0 }],
   };
   games.set(gameId, gameInfo);
-  ws.gameId = gameId;
-  ws.playerName = params.playerName;
+  setWsData(ws, gameId, params.playerName);
 
   ws.send(JSON.stringify(getJoinGameResult(action, gameId, params.playerName)));
 }

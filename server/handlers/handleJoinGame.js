@@ -1,7 +1,12 @@
 const FailedActionError = require('../errors/FailedActionError');
 const validation = require('./parameterValidation');
 
-const { broadcastMessage, getJoinGameResult } = require('./commonFunctions');
+const {
+  broadcastMessage,
+  getJoinGameResult,
+  setWsData,
+  getSocketListFromGameInfo,
+} = require('./commonFunctions');
 
 const { ACTIONS } = require('../Constants');
 
@@ -13,7 +18,7 @@ const action = ACTIONS.JOIN_GAME;
  * @param {Object} params - must contain id of the game and name of the player
  */
 function handleJoinGame(ws, games, params) {
-  // TODO check if player is already in game, do nothing or error if they are
+  // TODO check if player is already in game, do nothing or error if they are (same for create)
   validation.paramsNotNull(params, action);
   validation.containsGameId(params, action);
   validation.containsPlayerName(params, action);
@@ -23,8 +28,7 @@ function handleJoinGame(ws, games, params) {
   } else {
     const gameInfo = games.get(params.gameId);
     gameInfo.players.push({ socket: ws, score: 0 });
-    ws.gameId = params.gameId;
-    ws.playerName = params.playerName;
+    setWsData(ws, params.gameId, params.playerName);
     ws.send(JSON.stringify({
       action,
       status: 'success',
@@ -32,7 +36,7 @@ function handleJoinGame(ws, games, params) {
     // TODO refactor code for creating player object (duplicated in create)
     broadcastMessage(
       getJoinGameResult(action, params.gameId, params.playerName),
-      gameInfo.players.map((player) => player.socket),
+      getSocketListFromGameInfo(gameInfo),
     );
   }
 }

@@ -1,7 +1,12 @@
 const validation = require('./parameterValidation');
 
 const { ACTIONS } = require('../Constants');
-const { broadcastMessage, getGameStateObject } = require('./commonFunctions');
+const {
+  broadcastMessage,
+  getGameStateObject,
+  setWsData,
+  getSocketListFromGameInfo,
+} = require('./commonFunctions');
 
 const action = ACTIONS.LEAVE_GAME;
 
@@ -12,10 +17,8 @@ function handleLeaveGame(ws, games) {
   const { gameId } = ws;
   const gameInfo = games.get(gameId);
 
-  // TODO refactor this code and code in create into a common function
   gameInfo.players.filter((player) => player.socket !== ws);
-  ws.gameId = null;
-  ws.playerName = null;
+  setWsData(ws, null, null);
 
   if (gameInfo.players.length === 0) {
     games.delete(gameId);
@@ -24,7 +27,7 @@ function handleLeaveGame(ws, games) {
       status: 'success',
     }));
   } else {
-    broadcastMessage(getGameStateObject(gameInfo), gameInfo.players.map((player) => player.socket));
+    broadcastMessage(getGameStateObject(gameInfo), getSocketListFromGameInfo(gameInfo));
   }
 }
 
