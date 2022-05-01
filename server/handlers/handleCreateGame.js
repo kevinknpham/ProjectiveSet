@@ -1,44 +1,53 @@
-const FailedActionError = require('../errors/FailedActionError');
 const validation = require('./parameterValidation');
 
-const { DEFAULT_NUM_DOTS, ACTIONS } = require('../Constants');
+const {
+  DEFAULT_NUM_DOTS, ACTIONS, NUM_CHARACTERS_IN_GAME_ID, GAME_ID_POSSIBLE_CHARACTERS,
+} = require('../Constants');
+const { getJoinGameResult } = require('./commonFunctions');
 
-// TODO change actions in handleMessage to use this or move action string literals to separate file
 const action = ACTIONS.CREATE_GAME;
 
 /**
  * Handles creation of a game
  * @param {WebSocket} ws - WebSocket to send responses to
- * @param {Object} params - must contain game's name and name of the player, optionally contains
+ * @param {Object} params - must contain name of the player, optionally contains
  * the number of dots to use
  */
 function handleCreateGame(ws, games, params) {
   validation.paramsNotNull(params, action);
-  validation.containsGameName(params, action);
   validation.containsPlayerName(params, action);
 
-  if (games.has(params.gameName)) {
-    throw new FailedActionError('create-game', `The name "${params.gameName}" has already been taken`);
-  } else {
-    const numDots = params.numDots || DEFAULT_NUM_DOTS;
-    const deck = createDeck(numDots);
-    shuffle(deck);
-    // TODO refactor creation of game mapping value to common function (if needed)
-    const gameInfo = {
-      numDots,
-      started: false,
-      table: [],
-      deck,
-      players: [{ socket: ws, score: 0 }],
-    };
-    games.set(params.gameName, gameInfo);
-    ws.gameName = params.gameName;
-    ws.playerName = params.playerName;
-    // TODO refactor into common file if needed
-    ws.send(JSON.stringify({
-      action,
-      status: 'success',
-    }));
+  // Verify numDots is a number
+  const numDots = params.numDots || DEFAULT_NUM_DOTS;
+  const deck = createDeck(numDots);
+  shuffle(deck);
+  const gameId = generateGameId(games);
+
+  const gameInfo = {
+    numDots,
+    started: false,
+    table: [],
+    deck,
+    players: [{ socket: ws, score: 0 }],
+  };
+  games.set(gameId, gameInfo);
+  ws.gameId = gameId;
+  ws.playerName = params.playerName;
+
+  ws.send(JSON.stringify(getJoinGameResult(action, gameId, params.playerName)));
+}
+
+function generateGameId(existingGamesMap) {
+  while (true) {
+    let result = '';
+    for (let i = 0; i < NUM_CHARACTERS_IN_GAME_ID; i += 1) {
+      result += GAME_ID_POSSIBLE_CHARACTERS[
+        Math.floor(GAME_ID_POSSIBLE_CHARACTERS.length * Math.random)
+      ];
+    }
+    if (!existingGamesMap.has(result)) {
+      return result;
+    }
   }
 }
 
@@ -49,8 +58,9 @@ function handleCreateGame(ws, games, params) {
 function createDeck(numDots, deck = [], currentCard = []) {
   if (numDots <= 0) {
     // if all values are 0, omit this card
-    if (!currentCard.includes(1)) {
-      deck.push(currentCard);
+    if (currentCard.includes(1)) {
+      // Push a copy of currentCard on to the array
+      deck.push([...currentCard]);
     }
   } else {
     currentCard.push(0);

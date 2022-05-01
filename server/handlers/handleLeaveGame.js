@@ -9,16 +9,16 @@ function handleLeaveGame(ws, games) {
   validation.playerIsInGame(ws, games, action);
 
   // remove player from game
-  const { gameName } = ws;
-  const gameInfo = games.get(gameName);
+  const { gameId } = ws;
+  const gameInfo = games.get(gameId);
 
   // TODO refactor this code and code in create into a common function
   gameInfo.players.filter((player) => player.socket !== ws);
-  ws.gameName = null;
+  ws.gameId = null;
   ws.playerName = null;
 
   if (gameInfo.players.length === 0) {
-    games.delete(gameName);
+    games.delete(gameId);
     ws.send(JSON.stringify({
       action,
       status: 'success',

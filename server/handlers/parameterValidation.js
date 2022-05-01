@@ -11,9 +11,9 @@ function paramsNotNull(params, action) {
   }
 }
 
-function containsGameName(params, action) {
-  if (!params.gameName) {
-    throw createError('params.gameName is invalid or undefined', action);
+function containsGameId(params, action) {
+  if (!params.gameId) {
+    throw createError('params.gameId is invalid or undefined', action);
   }
 }
 
@@ -29,8 +29,8 @@ function containsPlayerName(params, action) {
   }
 }
 
-function gameExists(games, gameName, action) {
-  if (!games.has(gameName)) {
+function gameExists(games, gameId, action) {
+  if (!games.has(gameId)) {
     // TODO fix error message
     throw createError('Client is not in a game', action);
   }
@@ -38,14 +38,14 @@ function gameExists(games, gameName, action) {
 
 // TODO can split into validating game exists and another function for ensuring player is in game
 function playerIsInGame(ws, games, action) {
-  if (!ws.gameName) {
+  if (!ws.gameId) {
     throw createError('Client is not in a game', action);
   }
-  if (!games.has(ws.gameName)) {
+  if (!games.has(ws.gameId)) {
     // TODO could be made into InvalidRequestError depending on how disconnect is implemented
-    throw new Error(`Client made request for inactive or unknown game: ${ws.gameName}`);
+    throw new Error(`Client made request for inactive or unknown game: ${ws.gameId}`);
   }
-  if (games.get(ws.gameName).players.filter((el) => el.socket === ws).length === 0) {
+  if (games.get(ws.gameId).players.filter((el) => el.socket === ws).length === 0) {
     // TODO Should this be a client error? Or an internal server error?
     throw createError('Client is not in the specified game', action);
   }
@@ -68,7 +68,7 @@ function createError(msg, action) {
 
 module.exports = {
   paramsNotNull,
-  containsGameName,
+  containsGameId,
   containsCards,
   containsPlayerName,
   playerIsInGame,

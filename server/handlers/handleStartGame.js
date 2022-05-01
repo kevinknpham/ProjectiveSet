@@ -13,7 +13,7 @@ const action = ACTIONS.START_GAME;
 function handleStartGame(ws, games) {
   validation.playerIsInGame(ws, games, action);
 
-  const gameInfo = games.get(ws.gameName);
+  const gameInfo = games.get(ws.gameId);
   gameInfo.started = true;
 
   // Set table

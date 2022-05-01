@@ -2,10 +2,10 @@
 <html lang="en">
   <head>
     <script defer>
-        // const HOST = 'ws://localhost:2345/game';
-        // const ws = new WebSocket(HOST);
-        let HOST = location.origin.replace(/^http/, 'ws');
-let ws = new WebSocket(HOST);
+        const HOST = 'ws://localhost:2345/game';
+        const ws = new WebSocket(HOST);
+//         let HOST = location.origin.replace(/^http/, 'ws') + '/game';
+//         let ws = new WebSocket(HOST);
         
         window.addEventListener('load', init);
 
@@ -20,6 +20,13 @@ let ws = new WebSocket(HOST);
 {
   "action": "",
   "params": {
+    "": "",
+    "": "",
+    "": "",
+    "": "",
+    "": "",
+    "": "",
+    "": "",
     "": ""
   }
 }
@@ -42,7 +49,8 @@ let ws = new WebSocket(HOST);
 {
   "action": "create-game",
   "params": {
-    "": ""
+    "gameId": "game1",
+    "playerName": "player1"
   }
 }
           `.trim();

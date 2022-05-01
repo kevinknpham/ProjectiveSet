@@ -43,6 +43,23 @@ function broadcastMessage(message, clients) {
 }
 
 /**
+ * @param {String} action - action this result came from
+ * @param {String} gameId - id of game
+ * @param {String} playerName - name of new player
+ * @returns
+ */
+function getJoinGameResult(action, gameId, playerName) {
+  return {
+    action,
+    gameId,
+    player: {
+      name: playerName,
+      score: 0,
+    },
+  };
+}
+
+/**
  * Extracts the external game state data to be sent to clients from the full data stored in `games`
  * @param {Object} fullGameData - data stored internally
  */
@@ -66,4 +83,5 @@ module.exports = {
   findCardInTable,
   broadcastMessage,
   getGameStateObject,
+  getJoinGameResult,
 };

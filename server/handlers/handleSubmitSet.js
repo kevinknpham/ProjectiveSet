@@ -19,7 +19,7 @@ function handleSubmitSet(ws, games, params) {
   validation.containsCards(params, action);
   validation.playerIsInGame(ws, games, action);
 
-  const gameInfo = games.get(ws.gameName);
+  const gameInfo = games.get(ws.gameId);
 
   validation.isValidSubsetOfCards(params.cards, gameInfo.table);
 
@@ -27,7 +27,7 @@ function handleSubmitSet(ws, games, params) {
     throw new FailedActionError('submit-set', 'The given params.cards does not make a valid set');
   } else {
     // Update scores
-    gameInfo.players.reduce((el) => el.socket === ws).forEach((el) => el.score += 1);
+    gameInfo.players.filter((el) => el.socket === ws).forEach((el) => el.score += 1);
     // Remove cards from table
     removeCardsFromTable(params.cards, gameInfo.table);
     // Repopulate deck
@@ -56,9 +56,8 @@ function isASet(cards, numDots) {
 }
 
 function removeCardsFromTable(set, table) {
-  for (const card of set) {
-    table.remove(findCardInTable(table, card));
-  }
+  const cardsToRemove = set.map((card) => findCardInTable(table, card));
+  table.filter((card) => !cardsToRemove.includes(card));
 }
 
 module.exports = handleSubmitSet;

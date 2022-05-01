@@ -35,7 +35,7 @@ app.ws('/game', (ws, req) => {
 
   // eslint-disable-next-line no-unused-vars
   ws.on('close', (reason, description) => {
-    if (ws.gameName) {
+    if (ws.gameId) {
       handleLeaveGame(ws, games);
     }
   });
