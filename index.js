@@ -18,7 +18,7 @@ app.get('/api', (req, res) => {
 
 app.listen(process.env.PORT || PORT);
 
-// games maps the name of a game to an object containing metadata about the game and the
+// games maps the id of a game to an object containing metadata about the game and the
 // remaining cards in the deck
 // key - name of game
 // value - {table=Number[][], deck=Number[][], players=Object[], started=Boolean, numDots=Number}

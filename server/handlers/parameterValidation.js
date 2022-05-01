@@ -3,7 +3,7 @@
  */
 
 const InvalidRequestError = require('../errors/InvalidRequestError');
-const { findCardInTable } = require('./commonFunctions');
+const { findCardInListOfCards } = require('./commonFunctions');
 
 function paramsNotNull(params, action) {
   if (!params) {
@@ -53,7 +53,7 @@ function playerIsInGame(ws, games, action) {
 
 function isValidSubsetOfCards(subset, superset) {
   for (const card of subset) {
-    if (!findCardInTable(superset, card)) {
+    if (!findCardInListOfCards(superset, card)) {
       throw new InvalidRequestError('submit-set: At least one card in the set is not on the table');
     }
   }

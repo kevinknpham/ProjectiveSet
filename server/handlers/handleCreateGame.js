@@ -38,11 +38,12 @@ function handleCreateGame(ws, games, params) {
 }
 
 function generateGameId(existingGamesMap) {
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     let result = '';
     for (let i = 0; i < NUM_CHARACTERS_IN_GAME_ID; i += 1) {
       result += GAME_ID_POSSIBLE_CHARACTERS[
-        Math.floor(GAME_ID_POSSIBLE_CHARACTERS.length * Math.random)
+        Math.floor(GAME_ID_POSSIBLE_CHARACTERS.length * Math.random())
       ];
     }
     if (!existingGamesMap.has(result)) {

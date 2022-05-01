@@ -18,14 +18,14 @@ function cardEquals(card1, card2) {
 
 /**
  *
- * @param {Number[][]} table - list of cards to check
+ * @param {Number[][]} listOfCards - list of cards to check
  * @param {Number[]} card - card to check against list
  * @returns card in table that equals card, null if not found
  */
-function findCardInTable(table, card) {
-  for (const cardInTable of table) {
-    if (cardEquals(cardInTable, card)) {
-      return cardInTable;
+function findCardInListOfCards(listOfCards, card) {
+  for (const cardInList of listOfCards) {
+    if (cardEquals(cardInList, card)) {
+      return cardInList;
     }
   }
   return null;
@@ -80,7 +80,7 @@ function getGameStateObject(fullGameData) {
 module.exports = {
   refillTable,
   cardEquals,
-  findCardInTable,
+  findCardInListOfCards,
   broadcastMessage,
   getGameStateObject,
   getJoinGameResult,

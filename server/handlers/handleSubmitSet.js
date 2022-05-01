@@ -2,7 +2,7 @@ const FailedActionError = require('../errors/FailedActionError');
 const validation = require('./parameterValidation');
 
 const {
-  refillTable, findCardInTable, getGameStateObject, broadcastMessage,
+  refillTable, findCardInListOfCards, getGameStateObject, broadcastMessage,
 } = require('./commonFunctions');
 
 const { ACTIONS } = require('../Constants');
@@ -29,12 +29,12 @@ function handleSubmitSet(ws, games, params) {
     // Update scores
     gameInfo.players.filter((el) => el.socket === ws).forEach((el) => el.score += 1);
     // Remove cards from table
-    removeCardsFromTable(params.cards, gameInfo.table);
+    gameInfo.table = removeCardsFromTable(params.cards, gameInfo.table);
     // Repopulate deck
     refillTable(gameInfo.table, gameInfo.deck, gameInfo.numDots);
     // Broadcast to all clients
     broadcastMessage(getGameStateObject(gameInfo), gameInfo.players.map((player) => player.socket));
-    // TODO remove game from list if needed
+    // TODO remove game from list if ended
   }
 }
 
@@ -44,6 +44,7 @@ function handleSubmitSet(ws, games, params) {
  * @param {Number} numDots - number of dots on a single card
  */
 function isASet(cards, numDots) {
+  // TODO verify cards unique
   const parities = new Array(numDots);
   parities.fill(0);
   for (const card of cards) {
@@ -56,8 +57,7 @@ function isASet(cards, numDots) {
 }
 
 function removeCardsFromTable(set, table) {
-  const cardsToRemove = set.map((card) => findCardInTable(table, card));
-  table.filter((card) => !cardsToRemove.includes(card));
+  return table.filter((card) => !findCardInListOfCards(set, card));
 }
 
 module.exports = handleSubmitSet;
