@@ -4,11 +4,11 @@ const app = express();
 
 require('express-ws')(app);
 
-const PORT = 2345;
+const PORT = process.env.PORT || 2345;
 
 app.use(express.static('public'));
 // TODO remove for actual finished product
-app.use(express.static('test'));
+app.use(express.static('test/manual'));
 
 app.get('/api', (req, res) => {
   res.send({
@@ -16,7 +16,10 @@ app.get('/api', (req, res) => {
   });
 });
 
-app.listen(process.env.PORT || PORT);
+app.listen(PORT, () => {
+  console.log(`Listening on ${PORT}`);
+  console.log(`http://localhost:${PORT}/`);
+});
 
 // games maps the id of a game to an object containing metadata about the game and the
 // remaining cards in the deck

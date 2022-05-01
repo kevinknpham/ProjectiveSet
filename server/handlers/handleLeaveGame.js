@@ -17,7 +17,7 @@ function handleLeaveGame(ws, games) {
   const { gameId } = ws;
   const gameInfo = games.get(gameId);
 
-  gameInfo.players.filter((player) => player.socket !== ws);
+  gameInfo.players = gameInfo.players.filter((player) => player.socket !== ws);
   setWsData(ws, null, null);
 
   if (gameInfo.players.length === 0) {

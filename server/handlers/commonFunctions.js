@@ -79,7 +79,7 @@ function getGameStateObject(fullGameData) {
 
 function setWsData(ws, gameId, playerName) {
   ws.gameId = gameId;
-  // TODO should we persist player name between websockets?
+  // TODO should we persist player name between games for same websocket?
   ws.playerName = playerName;
 }
 

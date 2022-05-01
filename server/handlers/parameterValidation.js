@@ -43,6 +43,16 @@ function containsPlayerName(params, action) {
   }
 }
 
+function playerIsNotInAGame(games, ws, action) {
+  const gameInfos = Array.from(games.values());
+  const playerSockets = gameInfos.map((gameInfo) => gameInfo.players.map(
+    (playerInfo) => playerInfo.socket,
+  )).flat();
+  if (playerSockets.includes(ws)) {
+    throw createError('Client is already in a game. Please leave before entering another game', action);
+  }
+}
+
 function gameExists(games, gameId, action) {
   if (!games.has(gameId)) {
     // TODO fix error message
@@ -50,7 +60,6 @@ function gameExists(games, gameId, action) {
   }
 }
 
-// TODO can split into validating game exists and another function for ensuring player is in game
 function playerIsInGame(ws, games, action) {
   if (!ws.gameId) {
     throw createError('Client is not in a game', action);
@@ -89,4 +98,5 @@ module.exports = {
   playerIsInGame,
   gameExists,
   isValidSubsetOfCards,
+  playerIsNotInAGame,
 };

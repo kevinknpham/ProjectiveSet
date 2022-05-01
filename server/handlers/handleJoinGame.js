@@ -18,10 +18,10 @@ const action = ACTIONS.JOIN_GAME;
  * @param {Object} params - must contain id of the game and name of the player
  */
 function handleJoinGame(ws, games, params) {
-  // TODO check if player is already in game, do nothing or error if they are (same for create)
   validation.paramsNotNull(params, action);
   validation.containsGameId(params, action);
   validation.containsPlayerName(params, action);
+  validation.playerIsNotInAGame(games, ws, action);
 
   if (!games.has(params.gameId)) {
     throw new FailedActionError(action, `${params.gameId} is does not exist`);
@@ -33,7 +33,6 @@ function handleJoinGame(ws, games, params) {
       action,
       status: 'success',
     }));
-    // TODO refactor code for creating player object (duplicated in create)
     broadcastMessage(
       getJoinGameResult(action, params.gameId, params.playerName),
       getSocketListFromGameInfo(gameInfo),
