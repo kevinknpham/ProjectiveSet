@@ -7,31 +7,31 @@ const { findCardInListOfCards, cardEquals } = require('./commonFunctions');
 
 function paramsNotNull(params, action) {
   if (!params) {
-    throw createError('params is invalid or undefined', action);
+    throw createRequestError('params is invalid or undefined', action);
   }
 }
 
 function containsGameId(params, action) {
   if (!params.gameId) {
-    throw createError('params.gameId is invalid or undefined', action);
+    throw createRequestError('params.gameId is invalid or undefined', action);
   }
 }
 
 function containsCards(params, action) {
   if (!params.cards) {
-    throw createError('params.cards is invalid or undefined', action);
+    throw createRequestError('params.cards is invalid or undefined', action);
   }
 }
 
 function cardsAreValid(params, action) {
   const { cards } = params;
   if (cards.length === 0) {
-    throw createError('params.cards is empty', action);
+    throw createRequestError('params.cards is empty', action);
   }
   for (let i = 0; i < cards.length; i += 1) {
     for (let j = i + 1; j < cards.length; j += 1) {
       if (cardEquals(cards[i], cards[j])) {
-        throw createError('params.cards contains a duplicate card', action);
+        throw createRequestError('params.cards contains a duplicate card', action);
       }
     }
   }
@@ -39,7 +39,7 @@ function cardsAreValid(params, action) {
 
 function containsPlayerName(params, action) {
   if (!params.playerName) {
-    throw createError('params.playerName is invalid or undefined', action);
+    throw createRequestError('params.playerName is invalid or undefined', action);
   }
 }
 
@@ -49,28 +49,25 @@ function playerIsNotInAGame(games, ws, action) {
     (playerInfo) => playerInfo.socket,
   )).flat();
   if (playerSockets.includes(ws)) {
-    throw createError('Client is already in a game. Please leave before entering another game', action);
+    throw createRequestError('Client is already in a game. Please leave before entering another game', action);
   }
 }
 
 function gameExists(games, gameId, action) {
   if (!games.has(gameId)) {
-    // TODO fix error message
-    throw createError('Client is not in a game', action);
+    throw createRequestError('Client\'s game is missing or does not exist', action);
   }
 }
 
 function playerIsInGame(ws, games, action) {
   if (!ws.gameId) {
-    throw createError('Client is not in a game', action);
+    throw createRequestError('Client is not in a game', action);
   }
   if (!games.has(ws.gameId)) {
-    // TODO could be made into InvalidRequestError depending on how disconnect is implemented
     throw new Error(`Client made request for inactive or unknown game: ${ws.gameId}`);
   }
   if (games.get(ws.gameId).players.filter((el) => el.socket === ws).length === 0) {
-    // TODO Should this be a client error? Or an internal server error?
-    throw createError('Client is not in the specified game', action);
+    throw new Error(`Client is not in the specified game: ${ws.gameId}`);
   }
 }
 
@@ -82,7 +79,7 @@ function isValidSubsetOfCards(subset, superset) {
   }
 }
 
-function createError(msg, action) {
+function createRequestError(msg, action) {
   if (action) {
     return new InvalidRequestError(`Error for action "${action}". ${msg}`);
   }
