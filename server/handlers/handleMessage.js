@@ -67,6 +67,11 @@ function handleMessage(ws, games, msg) {
     } else {
       console.error('\u001b[31mEncountered unexpected error while handling message:\u001b[0m');
       console.error(e);
+      ws.send(JSON.stringify({
+        action: e.action,
+        status: 'error',
+        reason: 'Internal server error',
+      }));
     }
   }
 }
