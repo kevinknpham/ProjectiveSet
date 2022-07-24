@@ -33,7 +33,7 @@ All messages from the client to the server should contain an `action` attribute.
 > Submits a move to the server.  If the set is valid, the cards will be removed from the game and more will be added.
 > 
 > Required parameters:
-> * `params.cards` (Number[][]): List of cards. Each card is represented as a `Number[]` containing only `1`s and `0`s.  The cards must all be on the table (see below).  The cards must also be a valid set, meaning for every index _0 <= i < numDots_ in the cards, the sum of the _ith_ index of all the cards in `params.cards` must be even.
+> * `params.cards` (Number[][]): List of cards. Each card is represented as a `Number[]` containing only `1`s and `0`s.  The cards must all be on the table (see below).  The cards must also be a valid set, meaning for every index *0 <= i < numDots* in the cards, the sum of the *i*th index of all the cards in `params.cards` must be even.
 
 `action: 'start-game'`
 
